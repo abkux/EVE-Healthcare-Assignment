@@ -1,0 +1,154 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "EVE Healthcare Bookings",
+    "version": "1.0.0",
+    "description": "Diagnostic test bookings and a simulated payment flow. Prices are whole INR. Appointment times are UTC."
+  },
+  "servers": [
+    { "url": "http://localhost:3000" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": { "200": { "description": "Service is up" } }
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "summary": "Create a patient account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "password"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User and token" },
+          "400": { "description": "Invalid request" },
+          "409": { "description": "Email already registered" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Log in",
+        "responses": {
+          "200": { "description": "User and token" },
+          "401": { "description": "Invalid email or password" }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Current user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Current user" }, "401": { "description": "Missing or invalid token" } }
+      }
+    },
+    "/centres": {
+      "get": {
+        "summary": "List diagnostic centres",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
+          { "name": "location", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Paginated centres" } }
+      },
+      "post": {
+        "summary": "Create a centre",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "201": { "description": "Created" }, "403": { "description": "Admin only" } }
+      }
+    },
+    "/centres/{id}": {
+      "get": {
+        "summary": "Centre with its tests",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Centre" }, "404": { "description": "Not found" } }
+      }
+    },
+    "/centres/{id}/tests": {
+      "get": {
+        "summary": "List tests at a centre",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Paginated tests" } }
+      },
+      "post": {
+        "summary": "Add a test to a centre",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "201": { "description": "Created" }, "403": { "description": "Admin only" } }
+      }
+    },
+    "/bookings": {
+      "get": {
+        "summary": "List bookings for the current user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Paginated bookings" } }
+      },
+      "post": {
+        "summary": "Book a test. Amount is copied from the test price.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "201": { "description": "Pending booking" }, "409": { "description": "Slot already booked" } }
+      }
+    },
+    "/bookings/{id}": {
+      "get": {
+        "summary": "Get one booking",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Booking" }, "403": { "description": "Not the owner" }, "404": { "description": "Not found" } }
+      }
+    },
+    "/bookings/{id}/cancel": {
+      "post": {
+        "summary": "Cancel a pending or failed booking",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Cancelled" }, "409": { "description": "Confirmed bookings cannot be cancelled" } }
+      }
+    },
+    "/payments": {
+      "post": {
+        "summary": "Simulate a payment for a booking",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Payment applied" }, "409": { "description": "Booking cannot be paid" } }
+      }
+    },
+    "/payments/webhook": {
+      "post": {
+        "summary": "Idempotent payment status webhook",
+        "parameters": [
+          { "name": "X-Webhook-Secret", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Applied, ignored, or replayed" },
+          "400": { "description": "Invalid payload" },
+          "401": { "description": "Bad webhook secret" },
+          "404": { "description": "Unknown booking" }
+        }
+      }
+    }
+  }
+}

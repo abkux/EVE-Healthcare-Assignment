@@ -1,0 +1,18 @@
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      JWT_SECRET: change-me-in-production
+      WEBHOOK_SECRET: whsec_local_dev
+      DATABASE_PATH: /app/data/eve.sqlite
+      ADMIN_EMAIL: admin@eve.local
+      ADMIN_PASSWORD: admin12345
+      ADMIN_NAME: EVE Admin
+    volumes:
+      - eve-data:/app/data
+
+volumes:
+  eve-data:

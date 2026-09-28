@@ -1,0 +1,37 @@
+{
+  "name": "even-healthcare-assignment-hiring",
+  "version": "1.0.0",
+  "description": "EVE Healthcare hiring assignment for the role SDE Intern",
+  "keywords": [
+    "backend"
+  ],
+  "homepage": "https://github.com/abkux/EVE-Healthcare-Assignment#readme",
+  "bugs": {
+    "url": "https://github.com/abkux/EVE-Healthcare-Assignment/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abkux/EVE-Healthcare-Assignment.git"
+  },
+  "license": "ISC",
+  "author": "abhishek <theabku@gmail.com>",
+  "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "run": "node index.js",
+    "dev": "node --watch index.js",
+    "seed": "node src/db/seed.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.11.1",
+    "dotenv": "^18.0.4",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
+  }
+}
