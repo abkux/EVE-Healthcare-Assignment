@@ -4,8 +4,7 @@ Small Node.js API for diagnostic test bookings and a simulated payment flow. Bui
 
 I can make this in FastAPI or Java Sprint Boot ( yeah learning this ) - I have used SQLite for MVP. Incase of real production would use PostgreSQL or MongoDB depends on requirments.
 
-Zod or similar library can be use for validations.
-
+Zod or similar library can be use for validations. Incase you looking for same work in different library or language let me know.
 
 ## Stack
 
